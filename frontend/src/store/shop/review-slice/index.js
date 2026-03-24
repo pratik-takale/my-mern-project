@@ -1,58 +1,58 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const BASE_URL = "http://localhost:5000";
+
 const initialState = {
   isLoading: false,
   reviews: [],
   error: null,
 };
 
-// Add a new review
+// =======================
+// ADD REVIEW
+// =======================
 export const addReview = createAsyncThunk(
   "shopReview/addReview",
-  async (formdata, { getState, rejectWithValue }) => {
+  async (formdata, { rejectWithValue }) => {
     try {
-      const user = getState().auth.user;
-      const token = user?.token;
-      if (!token) return rejectWithValue("Please login to add a review");
-
-      // const res = await axios.post(
-      //   "http://localhost:5000/api/shop/review/add",
-      //   formdata,
-      //   {
-      //     headers: { Authorization: `Bearer ${token}` },
-      //   }
-      // );
       const res = await axios.post(
-  `http://localhost:5000/api/shop/review/${formdata.productId}/reviews`,
-  formdata,
-  {
-    headers: { Authorization: `Bearer ${token}` },
-  }
-);
+        `${BASE_URL}/api/shop/review/${formdata.productId}/reviews`,
+        formdata
+      );
 
-      return res.data; // should contain { success: true, data: newReview }
+      return res.data; // { success: true, data: review }
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Failed to add review");
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to add review"
+      );
     }
   }
 );
 
-// Fetch reviews for a product
+// =======================
+// GET REVIEWS
+// =======================
 export const getReviews = createAsyncThunk(
   "shopReview/getReviews",
   async (productId, { rejectWithValue }) => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/shop/review/${productId}`
+        `${BASE_URL}/api/shop/review/${productId}/reviews`
       );
-      return res.data.data || []; // make sure it matches backend response
+
+      return res.data?.data || [];
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Failed to fetch reviews");
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch reviews"
+      );
     }
   }
 );
 
+// =======================
+// SLICE
+// =======================
 const reviewSlice = createSlice({
   name: "shopReview",
   initialState,
@@ -64,6 +64,7 @@ const reviewSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // GET REVIEWS
       .addCase(getReviews.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -77,9 +78,11 @@ const reviewSlice = createSlice({
         state.reviews = [];
         state.error = action.payload;
       })
+
+      // ADD REVIEW
       .addCase(addReview.fulfilled, (state, action) => {
         if (action.payload?.success) {
-          state.reviews.push(action.payload.data); // push the new review
+          state.reviews.push(action.payload.data);
         }
       })
       .addCase(addReview.rejected, (state, action) => {

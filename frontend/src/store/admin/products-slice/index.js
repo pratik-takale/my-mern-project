@@ -8,41 +8,26 @@ const initialState = {
 };
 
 // ➕ Add Product
+// ➕ Add Product (FIXED)
 export const addNewProduct = createAsyncThunk(
   "products/addNewProduct",
   async (formData, { rejectWithValue }) => {
     try {
-      const data = new FormData();
-      data.append("title", formData.title);
-      data.append("description", formData.description);
-      data.append("category", formData.category);
-      data.append("brand", formData.brand);
-      data.append("price", formData.price);
-      data.append("salePrice", formData.salePrice);
-      data.append("totalStock", formData.totalStock);
-      data.append("averageReview", formData.averageReview);
-
-      if (formData.image) {
-        data.append("my_file", formData.image); // ✅ multer config सोबत match
-      }
-
       const result = await axios.post(
         "http://localhost:5000/api/admin/products/add",
-        data,
+        formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
           },
         }
       );
-
       return result?.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Add failed");
     }
   }
 );
-
 // 📥 Fetch All Products
 export const fetchAllProducts = createAsyncThunk(
   "products/fetchAllProducts",

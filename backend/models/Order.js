@@ -8,7 +8,7 @@ const OrderSchema = new mongoose.Schema({
       productId: String,
       title: String,
       image: String,
-      price: String,
+      price: Number,
       quantity: Number,
     },
   ],
@@ -20,7 +20,11 @@ const OrderSchema = new mongoose.Schema({
     phone: String,
     notes: String,
   },
-  orderStatus: String,
+  orderStatus: {
+  type: String,
+  enum: ["pending", "confirmed", "shipped", "delivered"],
+  default: "pending",
+},
   paymentMethod: String,
   paymentStatus: String,
   totalAmount: Number,
@@ -30,4 +34,4 @@ const OrderSchema = new mongoose.Schema({
   payerId: String,
 });
 
-module.exports = mongoose.model("Order", OrderSchema);
+module.exports = mongoose.models.Order || mongoose.model("Order", OrderSchema);

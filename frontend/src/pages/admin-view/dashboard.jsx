@@ -4,14 +4,50 @@ import { addFeatureImage, getFeatureImages } from "@/store/common-slice";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
+
 function AdminDashboard() {
   const [imageFile, setImageFile] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const [imageLoadingState, setImageLoadingState] = useState(false);
+
+  const [stats, setStats] = useState({
+    totalOrders: 0,
+    totalRevenue: 0,
+  });
+
+  const [chartData, setChartData] = useState([]);
+
   const dispatch = useDispatch();
   const { featureImageList } = useSelector((state) => state.commonFeature);
 
-  console.log(uploadedImageUrl, "uploadedImageUrl");
+  // 🔥 Fetch dashboard data
+  useEffect(() => {
+    fetch("http://localhost:5000/api/shop/order/dashboard")
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success) {
+          setStats({
+            totalOrders: res.totalOrders,
+            totalRevenue: res.totalRevenue,
+          });
+
+          const formattedData = Object.keys(res.salesData).map((date) => ({
+            date,
+            revenue: res.salesData[date],
+          }));
+
+          setChartData(formattedData);
+        }
+      });
+  }, []);
 
   function handleUploadFeatureImage() {
     dispatch(addFeatureImage(uploadedImageUrl)).then((data) => {
@@ -27,10 +63,36 @@ function AdminDashboard() {
     dispatch(getFeatureImages());
   }, [dispatch]);
 
-  console.log(featureImageList, "featureImageList");
-
   return (
-    <div>
+    <div className="p-6 space-y-8">
+      
+      {/* 🔥 STATS */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white shadow p-4 rounded">
+          <h3>Total Orders</h3>
+          <p className="text-xl font-bold">{stats.totalOrders}</p>
+        </div>
+
+        <div className="bg-white shadow p-4 rounded">
+          <h3>Total Revenue</h3>
+          <p className="text-xl font-bold">₹{stats.totalRevenue}</p>
+        </div>
+      </div>
+
+      {/* 🔥 CHART */}
+      <div className="bg-white p-4 shadow rounded">
+        <h3 className="mb-4 font-semibold">Sales Chart</h3>
+
+        <LineChart width={700} height={300} data={chartData}>
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+          <CartesianGrid stroke="#ccc" />
+          <Line type="monotone" dataKey="revenue" />
+        </LineChart>
+      </div>
+
+      {/* 🔥 IMAGE UPLOAD (YOUR OLD FEATURE - KEPT) */}
       <ProductImageUpload
         imageFile={imageFile}
         setImageFile={setImageFile}
@@ -39,22 +101,20 @@ function AdminDashboard() {
         setImageLoadingState={setImageLoadingState}
         imageLoadingState={imageLoadingState}
         isCustomStyling={true}
-        // isEditMode={currentEditedId !== null}
       />
-      <Button onClick={handleUploadFeatureImage} className="mt-5 w-full">
+
+      <Button onClick={handleUploadFeatureImage} className="w-full">
         Upload
       </Button>
-      <div className="flex flex-col gap-4 mt-5">
-        {featureImageList && featureImageList.length > 0
-          ? featureImageList.map((featureImgItem) => (
-              <div className="relative">
-                <img
-                  src={featureImgItem.image}
-                  className="w-full h-[300px] object-cover rounded-t-lg"
-                />
-              </div>
-            ))
-          : null}
+
+      <div className="flex flex-col gap-4">
+        {featureImageList?.map((img) => (
+          <img
+            key={img._id}
+            src={img.image}
+            className="w-full h-[300px] object-cover rounded"
+          />
+        ))}
       </div>
     </div>
   );

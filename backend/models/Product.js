@@ -2,17 +2,34 @@ const mongoose = require("mongoose");
 
 const ProductSchema = new mongoose.Schema(
   {
-    image: String,
-    title: String,
+    images: [String],
+    title: {
+      type: String,
+      required: true
+    },
     description: String,
-    category: String,
+    category: {
+      type: String,
+      required: true
+    },
     brand: String,
-    price: Number,
+    price: {
+      type: Number,
+      required: true
+    },
     salePrice: Number,
-    totalStock: Number,
-    averageReview: Number,
+    totalStock: {
+      type: Number,
+      default: 0
+    },
+    averageReview: {
+      type: Number,
+      default: 0
+    },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Product", ProductSchema);
+// ✅ FIX (VERY IMPORTANT)
+module.exports =
+  mongoose.models.Product || mongoose.model("Product", ProductSchema);

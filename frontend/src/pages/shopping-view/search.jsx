@@ -1,4 +1,4 @@
-import ProductDetailsDialog from "@/components/shopping-view/product-details";
+import ProductDetailsDialog from "@/pages/shopping-view/product-details-page";
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";

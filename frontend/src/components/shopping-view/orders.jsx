@@ -59,8 +59,8 @@ function ShoppingOrders() {
           </TableHeader>
           <TableBody>
             {orderList && orderList.length > 0
-              ? orderList.map((orderItem) => (
-                  <TableRow>
+              ? [...orderList].reverse().map((orderItem) => (
+                  <TableRow key={orderItem._id}>
                     <TableCell>{orderItem?._id}</TableCell>
                     <TableCell>{orderItem?.orderDate.split("T")[0]}</TableCell>
                     <TableCell>
@@ -76,7 +76,7 @@ function ShoppingOrders() {
                         {orderItem?.orderStatus}
                       </Badge>
                     </TableCell>
-                    <TableCell>${orderItem?.totalAmount}</TableCell>
+                    <TableCell>₹{orderItem?.totalAmount}</TableCell>
                     <TableCell>
                       <Dialog
                         open={openDetailsDialog}

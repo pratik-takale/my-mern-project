@@ -5,18 +5,18 @@ function CheckAuth({ isAuthenticated, user, children }) {
 
   console.log(location.pathname, isAuthenticated);
 
+  // ROOT
   if (location.pathname === "/") {
     if (!isAuthenticated) {
       return <Navigate to="/auth/login" />;
     } else {
-      if (user?.role === "admin") {
-        return <Navigate to="/admin/dashboard" />;
-      } else {
-        return <Navigate to="/shop/home" />;
-      }
+      return user?.role === "admin"
+        ? <Navigate to="/admin/dashboard" />
+        : <Navigate to="/shop/home" />;
     }
   }
 
+  // NOT LOGGED IN
   if (
     !isAuthenticated &&
     !(
@@ -27,18 +27,18 @@ function CheckAuth({ isAuthenticated, user, children }) {
     return <Navigate to="/auth/login" />;
   }
 
+  // LOGGED IN → LOGIN PAGE BLOCK
   if (
     isAuthenticated &&
     (location.pathname.includes("/login") ||
       location.pathname.includes("/register"))
   ) {
-    if (user?.role === "admin") {
-      return <Navigate to="/admin/dashboard" />;
-    } else {
-      return <Navigate to="/shop/home" />;
-    }
+    return user?.role === "admin"
+      ? <Navigate to="/admin/dashboard" />
+      : <Navigate to="/shop/home" />;
   }
 
+  // USER TRYING ADMIN
   if (
     isAuthenticated &&
     user?.role !== "admin" &&
@@ -47,10 +47,12 @@ function CheckAuth({ isAuthenticated, user, children }) {
     return <Navigate to="/unauth-page" />;
   }
 
+  // ❌ FIXED: allow product page
   if (
     isAuthenticated &&
     user?.role === "admin" &&
-    location.pathname.includes("shop")
+    location.pathname.includes("shop") &&
+    !location.pathname.includes("/shop/product") // ✅ allow product page
   ) {
     return <Navigate to="/admin/dashboard" />;
   }

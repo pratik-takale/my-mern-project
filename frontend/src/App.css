@@ -40,3 +40,6 @@
 .read-the-docs {
   color: #888;
 }
+hover:scale-105
+transition-all duration-300
+rounded-xl shadow-sm

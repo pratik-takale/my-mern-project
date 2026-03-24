@@ -1,4 +1,5 @@
-require("dotenv").config(); // for .env
+// require("dotenv").config(); // for .env
+require("dotenv").config({ path: __dirname + "/.env" });
 const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
@@ -14,11 +15,10 @@ const shopAddressRouter = require("./routes/shop/address-routes");
 const shopOrderRouter = require("./routes/shop/order-routes");
 const shopSearchRouter = require("./routes/shop/search-routes");
 const shopReviewRouter = require("./routes/shop/review-routes");
-
 const commonFeatureRouter = require("./routes/common/feature-routes");
-
+const recommendationRoutes = require("./routes/shop/recommendation-routes");
 // Use proper MongoDB connection string
-const MONGO_URL = process.env.MONGO_URL || "mongodb://localhost:27017/myproject";
+const MONGO_URL = process.env.MONGO_URL ;
 
 mongoose
   .connect(MONGO_URL)
@@ -57,8 +57,11 @@ app.use("/api/shop/order", shopOrderRouter);
 app.use("/api/shop/search", shopSearchRouter);
 
 // ✅ Corrected: mount review routes under products
-app.use("/api/shop/products", shopReviewRouter);
+app.use("/api/shop/review", shopReviewRouter);
 
 app.use("/api/common/feature", commonFeatureRouter);
+app.use("/api/payment", require("./routes/payment-routes"));
+app.use("/api", recommendationRoutes);
+
 
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));

@@ -1,5 +1,6 @@
 const Product = require("../../models/Product");
 
+// GET FILTERED PRODUCTS
 const getFilteredProducts = async (req, res) => {
   try {
     const { category = [], brand = [], sortBy = "price-lowtohigh" } = req.query;
@@ -19,22 +20,16 @@ const getFilteredProducts = async (req, res) => {
     switch (sortBy) {
       case "price-lowtohigh":
         sort.price = 1;
-
         break;
       case "price-hightolow":
         sort.price = -1;
-
         break;
       case "title-atoz":
         sort.title = 1;
-
         break;
-
       case "title-ztoa":
         sort.title = -1;
-
         break;
-
       default:
         sort.price = 1;
         break;
@@ -46,15 +41,16 @@ const getFilteredProducts = async (req, res) => {
       success: true,
       data: products,
     });
-  } catch (e) {
+  } catch (error) {
     console.log(error);
     res.status(500).json({
       success: false,
-      message: "Some error occured",
+      message: "Some error occurred",
     });
   }
 };
 
+// GET PRODUCT DETAILS
 const getProductDetails = async (req, res) => {
   try {
     const { id } = req.params;
@@ -70,13 +66,41 @@ const getProductDetails = async (req, res) => {
       success: true,
       data: product,
     });
-  } catch (e) {
+  } catch (error) {
     console.log(error);
     res.status(500).json({
       success: false,
-      message: "Some error occured",
+      message: "Some error occurred",
     });
   }
 };
 
-module.exports = { getFilteredProducts, getProductDetails };
+// ✅ GET SIMILAR PRODUCTS
+const getSimilarProducts = async (req, res) => {
+  try {
+    const { category, productId } = req.query;
+
+    const products = await Product.find({
+      category,
+      _id: { $ne: productId },
+    }).limit(8);
+
+    res.status(200).json({
+      success: true,
+      data: products,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching similar products",
+    });
+  }
+};
+
+// ✅ FINAL EXPORT (VERY IMPORTANT)
+module.exports = {
+  getFilteredProducts,
+  getProductDetails,
+  getSimilarProducts,
+};
