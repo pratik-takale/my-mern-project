@@ -1,10 +1,8 @@
 const express = require("express");
 const router = express.Router();
-
 const { getUserRecommendations } = require("../../controllers/shop/recommendation-controller");
+const auth = require("../../middleware/auth");
 
-// ✅ route
-router.get("/recommendations", getUserRecommendations);
+router.get("/", auth, getUserRecommendations);
 
-// ✅ export router
 module.exports = router;

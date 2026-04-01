@@ -37,11 +37,10 @@ function ShoppingHome() {
   const { featureImageList: apiFeatureImages } = useSelector(
     (state) => state.commonFeature
   );
-  const { items: recommendations = [], loading } = useSelector(
-    (state) => state.recommendations
-  );
-
   const { user } = useSelector((state) => state.auth);
+  const { items: recommendations, loading } = useSelector(
+  (state) => state.recommendations
+);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -70,10 +69,11 @@ function ShoppingHome() {
   }, [featureImageList]);
 
   // ✅ Recommendations
-  useEffect(() => {
-    dispatch(fetchRecommendations());
-  }, [dispatch]);
-
+useEffect(() => {
+  if (user?._id) {
+    dispatch(fetchRecommendations(user._id));
+  }
+}, [dispatch, user]);
   const handleGetProductDetails = (productId) => {
     navigate(`/shop/product/${productId}`);
   };
@@ -118,37 +118,40 @@ function ShoppingHome() {
       </div>
 
       {/* RECOMMENDATIONS */}
-      <section className="py-10 px-6">
-        <h2 className="text-2xl font-bold mb-6">
-          {recommendations.length > 0
-            ? "Trending Products "
-            : "Recommended for You"}
-        </h2>
+<section className="py-10 px-6">
+  <h2 className="text-2xl font-bold mb-6">
+    {recommendations.length > 0
+      ? "Recommended for You 🎯"
+      : "Trending Products 🔥"}
+  </h2>
 
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {recommendations.map((product) => (
-              <div key={product._id} className="bg-white p-3 rounded shadow">
-                <img
-                  src={product.images?.[0] || "https://via.placeholder.com/150"}
-                  onClick={() => handleGetProductDetails(product._id)}
+  {loading ? (
+    <p>Loading...</p>
+  ) : (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      {recommendations.map((product) => (
+        <div
+          key={product._id}
+          className="bg-white p-3 rounded shadow hover:shadow-lg transition"
+        >
+          <img
+            src={product.images?.[0] || "https://via.placeholder.com/150"}
+            onClick={() => handleGetProductDetails(product._id)}
+            className="w-full h-40 object-cover rounded cursor-pointer"
+          />
 
-                  className="w-full h-40 object-cover rounded"
-                />
-                <h4 className="mt-2 text-sm font-semibold">
-                  {product.title}
-                </h4>
-                <p className="text-green-600 font-bold">
-                  ₹{product.salePrice}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+          <h4 className="mt-2 text-sm font-semibold">
+            {product.title}
+          </h4>
 
+          <p className="text-green-600 font-bold">
+            ₹{product.salePrice || product.price}
+          </p>
+        </div>
+      ))}
+    </div>
+  )}
+</section>
       {/* CATEGORY */}
       <section className="py-10 bg-white">
         <h2 className="text-2xl font-bold text-center mb-6">
