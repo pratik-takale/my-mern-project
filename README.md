@@ -126,7 +126,6 @@ RAZORPAY_SECRET=your_secret
 
 ##  Screenshots
 
-##  Screenshots
 ###  Login & Register Page
 ![Home](screenshots/login.png)
 ###  Home Page
@@ -150,7 +149,7 @@ RAZORPAY_SECRET=your_secret
 
 * Data Scientist
 * MERN Stack Developer
-* AI/ML Enthusiast
+
 
 ---
 
